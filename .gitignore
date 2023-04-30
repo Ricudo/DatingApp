@@ -479,3 +479,4 @@ API/appsettings.json
 client/.vscode/
 client/ssl/server.crt
 client/ssl/server.key
+.vscode
