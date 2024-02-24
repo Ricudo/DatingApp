@@ -40,7 +40,7 @@ export class PhotoEditorComponent implements OnInit {
   }
 
   setMainPhoto(photo: Photo) {
-    this._memberService.setMainPhoto(photo.id).subscribe({
+    this._memberService.setMainPhoto$(photo.id).subscribe({
       next: () => {
         if (this.user && this.member) {
           this.user.photoUrl = photo.url;
@@ -56,7 +56,7 @@ export class PhotoEditorComponent implements OnInit {
   }
 
   deletePhoto(photoId: number) {
-    this._memberService.deletePhoto(photoId).subscribe({
+    this._memberService.deletePhoto$(photoId).subscribe({
       next: () => {
         if (this.member) {
           this.member.photos = this.member.photos.filter(
