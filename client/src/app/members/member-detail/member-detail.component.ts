@@ -1,42 +1,76 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { Member } from 'src/app/_models/member';
-import { MembersService } from 'src/app/_services/members.service';
-import { TabsModule } from 'ngx-bootstrap/tabs';
+import { TabDirective, TabsModule, TabsetComponent } from 'ngx-bootstrap/tabs';
 import { GalleryModule } from 'ng-gallery';
 import { GalleryItem, ImageItem } from 'ng-gallery';
 import { TimeagoModule } from 'ngx-timeago';
+import { MemberMessagesComponent } from '../member-messages/member-messages.component';
+import { MessageService } from 'src/app/_services/message.service';
+import { Message } from 'src/app/_models/message';
 
 @Component({
   standalone: true,
   selector: 'app-member-detail',
   templateUrl: './member-detail.component.html',
   styleUrls: ['./member-detail.component.css'],
-  imports: [CommonModule, TabsModule, GalleryModule, TimeagoModule],
+  imports: [
+    CommonModule,
+    TabsModule,
+    GalleryModule,
+    TimeagoModule,
+    MemberMessagesComponent,
+  ],
 })
 export class MemberDetailComponent implements OnInit {
-  member: Member | undefined;
+  @ViewChild('memberTabs', { static: true }) memberTabs?: TabsetComponent;
+  member: Member = {} as Member;
   images: GalleryItem[] = [];
+  activeTab?: TabDirective;
+  messages: Message[] = [];
 
   constructor(
-    private _memberService: MembersService,
+    private _messageService: MessageService,
     private _route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
-    this.loadMember();
-  }
+    this._route.data.subscribe({
+      next: (data) => (this.member = data['member']),
+    });
 
-  loadMember() {
-    var username = this._route.snapshot.paramMap.get('username');
-    if (!username) return;
-    this._memberService.getMember$(username).subscribe({
-      next: (member) => {
-        this.member = member;
-        this.getImages();
+    this._route.queryParams.subscribe({
+      next: (params) => {
+        params['tab'] && this.selectTab(params['tab']);
       },
     });
+
+    this.getImages();
+  }
+
+  selectTab(heading: string) {
+    if (this.memberTabs) {
+      const tab = this.memberTabs.tabs.find((x) => x.heading === heading);
+      if (tab) {
+        tab.active = true;
+      }
+    }
+  }
+
+  onTabActiveted(data: TabDirective) {
+    this.activeTab = data;
+    if (this.activeTab.heading === 'Messages') {
+      this.loadMessages();
+    }
+  }
+
+  loadMessages() {
+    if (this.member) {
+      this._messageService.getMessageThread$(this.member.userName).subscribe({
+        next: (messages) => (this.messages = messages),
+      });
+    }
   }
 
   getImages() {
