@@ -1,27 +1,23 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { AccountService } from '../_services/account.service';
 import { Router } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-nav',
   templateUrl: './nav.component.html',
   styleUrls: ['./nav.component.css'],
 })
-export class NavComponent implements OnInit {
+export class NavComponent {
   model: any = {};
 
-  constructor(
-    public accountService: AccountService,
-    private _router: Router,
-    private _toaster: ToastrService
-  ) {}
-
-  ngOnInit(): void {}
+  constructor(public accountService: AccountService, private _router: Router) {}
 
   login() {
     this.accountService.login(this.model).subscribe({
-      next: () => this._router.navigateByUrl('/members'),
+      next: () => {
+        this._router.navigateByUrl('/members');
+        this.model = {};
+      },
     });
   }
 
