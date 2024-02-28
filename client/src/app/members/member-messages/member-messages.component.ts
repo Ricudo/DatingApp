@@ -14,21 +14,17 @@ import { MessageService } from 'src/app/_services/message.service';
 })
 export class MemberMessagesComponent {
   @Input() username?: string;
-  @Input() messages: Message[] = [];
   messageContent = '';
 
-  constructor(private _messageService: MessageService) {}
+  constructor(public messageService: MessageService) {}
 
   sendMessage(messageForm: NgForm) {
     if (!this.username) return;
 
-    this._messageService
-      .sendMessage$(this.username, this.messageContent)
-      .subscribe({
-        next: (message) => {
-          this.messages.push(message);
-          messageForm.reset();
-        },
+    this.messageService
+      .sendMessage(this.username, this.messageContent)
+      .then(() => {
+        messageForm.reset();
       });
   }
 }
