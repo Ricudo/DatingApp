@@ -5,21 +5,21 @@ import { MemberListComponent } from './members/member-list/member-list.component
 import { MemberDetailComponent } from './members/member-detail/member-detail.component';
 import { ListsComponent } from './lists/lists.component';
 import { MessagesComponent } from './messages/messages.component';
-import { AuthGuard } from './_guards/auth.guard';
 import { NotFoundComponent } from './errors/not-found/not-found.component';
 import { ServerErrorComponent } from './errors/server-error/server-error.component';
 import { MemberEditComponent } from './members/member-edit/member-edit.component';
-import { PreventUnsavedChangesGuard } from './_guards/prevent-unsaved-changes.guard';
-import { MemberDetailedResolver } from './_resolvers/member-detailed.resolver';
 import { AdminPanelComponent } from './admin/admin-panel/admin-panel.component';
-import { AdminGuard } from './_guards/admin.guard';
+import { adminGuard } from './_guards/admin.guard';
+import { authGuard } from './_guards/auth.guard';
+import { preventUnsavedChangesGuard } from './_guards/prevent-unsaved-changes.guard';
+import { memberDetailedResolver } from './_resolvers/member-detailed.resolver';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
   {
     path: '',
     runGuardsAndResolvers: 'always',
-    canActivate: [AuthGuard],
+    canActivate: [authGuard],
     children: [
       {
         path: 'members',
@@ -28,12 +28,12 @@ const routes: Routes = [
       {
         path: 'members/:username',
         component: MemberDetailComponent,
-        resolve: { member: MemberDetailedResolver },
+        resolve: { member: memberDetailedResolver },
       },
       {
         path: 'member/edit',
         component: MemberEditComponent,
-        canDeactivate: [PreventUnsavedChangesGuard],
+        canDeactivate: [preventUnsavedChangesGuard],
       },
       { path: 'lists', component: ListsComponent },
       {
@@ -43,7 +43,7 @@ const routes: Routes = [
       {
         path: 'admin',
         component: AdminPanelComponent,
-        canActivate: [AdminGuard],
+        canActivate: [adminGuard],
       },
     ],
   },
